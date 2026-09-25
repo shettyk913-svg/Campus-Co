@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CampuSCO – find, book and use campus resources</title>
+<style>
+:root{
+  --bg:#f3f7fc;
+  --surface:#ffffff;
+  --surface-soft:#f8fbff;
+  --ink:#132238;
+  --mut:#64748b;
+  --mut2:#94a3b8;
+
+  --navy:#102a43;
+  --navy-2:#163f67;
+  --blue:#1d4ed8;
+  --blue-2:#2563eb;
+  --sky:#38bdf8;
+
+  --gold:#f4b942;
+  --gold-soft:#fff7df;
+
+  --success:#16845b;
+  --success-soft:#e8f7ef;
+  --warning:#c27616;
+  --warning-soft:#fff4dc;
+  --danger:#c0392b;
+  --danger-soft:#fdeceb;
+
+  --line:#dce5ef;
+  --shadow:0 10px 28px rgba(16,42,67,.08);
+  --shadow-hover:0 16px 38px rgba(16,42,67,.14);
+  --radius:16px;
+  --radius-sm:10px;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 10% 0%,rgba(56,189,248,.10),transparent 28%),
+    radial-gradient(circle at 90% 10%,rgba(29,78,216,.07),transparent 25%),
+    var(--bg);
+  line-height:1.55;
+}
+
+header{
+  position:relative;
+  overflow:hidden;
+  padding:28px clamp(20px,5vw,64px);
+  color:#fff;
+  background:
+    linear-gradient(105deg,rgba(8,30,52,.96),rgba(16,42,67,.86)),
+    url("assets/campus-hero.svg")
+    center/cover;
+  box-shadow:0 5px 22px rgba(16,42,67,.16);
+}
+
+header:after{
+  content:"";
+  position:absolute;
+  inset:auto -10% -70px auto;
+  width:320px;
+  height:180px;
+  background:rgba(244,185,66,.18);
+  border-radius:50%;
+  filter:blur(4px);
+}
+
+header h1{
+  position:relative;
+  z-index:1;
+  margin:0;
+  font-size:clamp(28px,4vw,44px);
+  line-height:1.05;
+  letter-spacing:-1.2px;
+  font-weight:800;
+}
+
+header p{
+  position:relative;
+  z-index:1;
+  margin:9px 0 0;
+  max-width:720px;
+  color:rgba(255,255,255,.82);
+  font-size:15px;
+}
+
+nav{
+  position:sticky;
+  top:0;
+  z-index:50;
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  padding:10px clamp(14px,4vw,50px);
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 4px 15px rgba(16,42,67,.05);
+}
+
+nav button{
+  border:1px solid transparent;
+  background:transparent;
+  color:#52657b;
+  padding:10px 14px;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s ease;
+}
+
+nav button:hover{
+  color:var(--blue);
+  background:#eef5ff;
+}
+
+nav button.active{
+  color:#fff;
+  background:var(--navy);
+  box-shadow:0 5px 14px rgba(16,42,67,.16);
+}
+
+main{
+  width:min(1320px,92%);
+  margin:0 auto;
+  padding:30px 0 60px;
+}
+
+h1,h2,h3{
+  color:var(--navy);
+  letter-spacing:-.35px;
+}
+
+h2{margin-top:0}
+h3{margin-bottom:7px}
+
+.bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  flex-wrap:wrap;
+  margin:0 0 20px;
+}
+
+.bar > div{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  flex-wrap:wrap;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+  gap:18px;
+}
+
+.panel{
+  background:rgba(255,255,255,.96);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:var(--shadow);
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+
+.panel:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--shadow-hover);
+  border-color:#cbd8e7;
+}
+
+button{
+  border:0;
+  border-radius:10px;
+  padding:10px 15px;
+  font:inherit;
+  font-weight:750;
+  cursor:pointer;
+  color:#fff;
+  background:linear-gradient(135deg,var(--blue),var(--blue-2));
+  box-shadow:0 5px 13px rgba(37,99,235,.18);
+  transition:.18s ease;
+}
+
+button:hover{
+  transform:translateY(-1px);
+  box-shadow:0 8px 18px rgba(37,99,235,.24);
+}
+
+button:active{transform:translateY(0)}
+
+button.secondary,
+.btn-secondary{
+  color:var(--navy);
+  background:#eef4fa;
+  box-shadow:none;
+}
+
+button.secondary:hover,
+.btn-secondary:hover{
+  background:#e3edf7;
+}
+
+button.gold{
+  color:#4a3500;
+  background:linear-gradient(135deg,#f7c95b,var(--gold));
+}
+
+button.danger{
+  background:linear-gradient(135deg,#d64b3c,#b83226);
+}
+
+input,select,textarea{
+  width:100%;
+  border:1px solid #ccd8e5;
+  border-radius:10px;
+  background:#fff;
+  color:var(--ink);
+  padding:11px 12px;
+  font:inherit;
+  outline:none;
+  transition:.18s ease;
+}
+
+input:focus,select:focus,textarea:focus{
+  border-color:var(--blue-2);
+  box-shadow:0 0 0 4px rgba(37,99,235,.10);
+}
+
+label{
+  display:block;
+  margin-bottom:6px;
+  color:#3b4d63;
+  font-size:13px;
+  font-weight:750;
+}
+
+.slot{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:13px;
+  background:var(--surface-soft);
+  transition:.18s ease;
+}
+
+.slot:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 18px rgba(16,42,67,.08);
+}
+
+.slot.av{
+  border-left:4px solid var(--success);
+  background:linear-gradient(90deg,var(--success-soft),#fff);
+}
+
+.slot.bk{
+  border-left:4px solid var(--danger);
+  background:linear-gradient(90deg,var(--danger-soft),#fff);
+}
+
+.slot.wl{
+  border-left:4px solid var(--warning);
+  background:linear-gradient(90deg,var(--warning-soft),#fff);
+}
+
+.chip,.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.chip{
+  color:var(--blue);
+  background:#eaf2ff;
+}
+
+.pill{
+  color:var(--navy);
+  background:#edf3f8;
+}
+
+.note{
+  padding:13px 15px;
+  border-radius:12px;
+  border:1px solid #dbe7f4;
+  background:#f5f9fe;
+  color:#40536a;
+}
+
+.warn{
+  padding:13px 15px;
+  border-radius:12px;
+  border:1px solid #f0d9a6;
+  background:var(--warning-soft);
+  color:#80530f;
+}
+
+.row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.acts{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:13px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:14px;
+  margin-bottom:22px;
+}
+
+.stat{
+  position:relative;
+  overflow:hidden;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+
+.stat:after{
+  content:"";
+  position:absolute;
+  width:75px;
+  height:75px;
+  right:-25px;
+  top:-25px;
+  border-radius:50%;
+  background:rgba(56,189,248,.10);
+}
+
+.stat strong{
+  display:block;
+  position:relative;
+  z-index:1;
+  color:var(--navy);
+  font-size:28px;
+  line-height:1.1;
+}
+
+.stat span{
+  color:var(--mut);
+  font-size:13px;
+  font-weight:650;
+}
+
+table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+}
+
+th,td{
+  padding:12px 14px;
+  text-align:left;
+  border-bottom:1px solid #e9eef4;
+}
+
+th{
+  color:#52657b;
+  background:#f6f9fc;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+tr:last-child td{border-bottom:0}
+
+.msg{
+  max-width:82%;
+  margin:9px 0;
+  padding:11px 14px;
+  border-radius:13px;
+  background:#eef4fa;
+  color:#30455b;
+}
+
+.msg.user{
+  margin-left:auto;
+  color:#fff;
+  background:linear-gradient(135deg,var(--navy),var(--navy-2));
+}
+
+#toast{
+  position:fixed;
+  right:22px;
+  bottom:22px;
+  z-index:100;
+  max-width:360px;
+  padding:13px 16px;
+  color:#fff;
+  background:var(--navy);
+  border-radius:12px;
+  box-shadow:0 12px 28px rgba(16,42,67,.25);
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(10px);
+  transition:.25s ease;
+}
+
+#toast.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+a{color:var(--blue);font-weight:650}
+a:hover{color:var(--navy)}
+
+:focus-visible{
+  outline:3px solid rgba(56,189,248,.55);
+  outline-offset:2px;
+}
+
+@media(max-width:720px){
+  header{padding:24px 20px}
+  nav{padding:8px 12px}
+  nav button{padding:9px 10px;font-size:12px}
+  main{width:94%;padding-top:22px}
+  .grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .panel{padding:16px}
+  .bar{align-items:flex-start}
+  .msg{max-width:94%}
+}
+
+@media(max-width:460px){
+  .stats{grid-template-columns:1fr}
+}
+
+/* Campus image helpers for any existing/new hero cards */
+.campus-hero{
+  position:relative;
+  min-height:250px;
+  display:flex;
+  align-items:flex-end;
+  overflow:hidden;
+  margin-bottom:24px;
+  border-radius:20px;
+  background:
+    linear-gradient(90deg,rgba(8,30,52,.90),rgba(8,30,52,.35)),
+    url("assets/campus-hero.svg")
+    center/cover;
+  box-shadow:var(--shadow);
+}
+
+.campus-hero-content{
+  max-width:700px;
+  padding:30px;
+  color:#fff;
+}
+
+.campus-hero-content h1,
+.campus-hero-content h2{
+  color:#fff;
+  margin:0 0 8px;
+}
+
+.campus-hero-content p{
+  margin:0;
+  color:rgba(255,255,255,.86);
+}
+
+.resource-image{
+  width:100%;
+  height:145px;
+  object-fit:cover;
+  border-radius:12px;
+  margin-bottom:13px;
+}
+
+.resource-card{
+  overflow:hidden;
+  padding:0;
+}
+
+.resource-card .resource-content{
+  padding:16px 18px 18px;
+}
+
+.gold-line{
+  width:48px;
+  height:4px;
+  margin:10px 0 18px;
+  border-radius:99px;
+  background:var(--gold);
+}
+
+/* ===== CampuSCO Aesthetic Hero ===== */
+:root{
+  --aesthetic-deep:#183b56;
+  --aesthetic-mid:#2f6687;
+  --aesthetic-soft:#e8f2f5;
+  --aesthetic-line:#d7e4ea;
+  --aesthetic-text:#18313f;
+  --aesthetic-muted:#6d8290;
+  --hero-radius:26px;
+}
+
+body{
+  color:var(--aesthetic-text);
+  background:
+    radial-gradient(circle at 12% 12%,rgba(47,102,135,.08),transparent 26%),
+    radial-gradient(circle at 88% 28%,rgba(232,242,245,.9),transparent 32%),
+    #f7fafb;
+}
+
+.hero{
+  position:relative;
+  width:min(1420px,calc(100% - 28px));
+  min-height:430px;
+  margin:14px auto 0;
+  padding:0;
+  overflow:hidden;
+  border-radius:var(--hero-radius);
+  color:#fff;
+  background:
+    linear-gradient(110deg,rgba(24,59,86,.98) 0%,rgba(24,59,86,.91) 42%,rgba(47,102,135,.56) 100%),
+    url("assets/campus-hero.svg") center/cover;
+  box-shadow:0 22px 55px rgba(24,59,86,.18);
+  border:1px solid rgba(255,255,255,.55);
+}
+
+.hero:before{
+  content:"";
+  position:absolute;
+  width:360px;
+  height:360px;
+  right:-100px;
+  top:-150px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:50%;
+  box-shadow:0 0 0 35px rgba(255,255,255,.025),0 0 0 70px rgba(255,255,255,.018);
+}
+
+.hero:after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:0;
+  width:100%;
+  height:5px;
+  background:linear-gradient(90deg,#b9d6df,#e5f0f2,#b9d6df);
+  opacity:.8;
+}
+
+.hero-overlay{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg,rgba(10,31,45,.08),rgba(10,31,45,.22)),
+    radial-gradient(circle at 72% 30%,rgba(214,235,240,.16),transparent 28%);
+  pointer-events:none;
+}
+
+.hero-inner{
+  position:relative;
+  z-index:2;
+  min-height:430px;
+  padding:32px clamp(22px,5vw,64px) 26px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.brand-lockup{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.brand-mark{
+  width:46px;
+  height:46px;
+  display:grid;
+  place-items:center;
+  border-radius:14px;
+  color:var(--aesthetic-deep);
+  background:#eef6f8;
+  font-size:22px;
+  font-weight:900;
+  box-shadow:0 8px 20px rgba(0,0,0,.12);
+}
+
+.brand-name{
+  font-size:20px;
+  line-height:1;
+  letter-spacing:.2px;
+  font-weight:850;
+}
+
+.brand-sub{
+  margin-top:4px;
+  color:rgba(255,255,255,.68);
+  font-size:10px;
+  font-weight:750;
+  letter-spacing:1.3px;
+  text-transform:uppercase;
+}
+
+.hero-copy{
+  max-width:750px;
+  margin-top:32px;
+}
+
+.hero-kicker{
+  display:inline-block;
+  margin-bottom:14px;
+  padding:7px 11px;
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:999px;
+  color:#dcebef;
+  background:rgba(255,255,255,.07);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:1.3px;
+  backdrop-filter:blur(6px);
+}
+
+.hero-copy h1{
+  margin:0;
+  color:#fff;
+  font-size:clamp(36px,5vw,64px);
+  line-height:1.03;
+  letter-spacing:-2px;
+  font-weight:850;
+}
+
+.hero-copy h1 em{
+  color:#c9e0e6;
+  font-style:normal;
+}
+
+.hero-copy p{
+  max-width:660px;
+  margin:18px 0 0;
+  color:rgba(255,255,255,.79);
+  font-size:15px;
+  line-height:1.7;
+}
+
+.hero-bottom{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-top:30px;
+  padding-top:17px;
+  border-top:1px solid rgba(255,255,255,.14);
+}
+
+.hero-bottom #clock{
+  color:rgba(255,255,255,.72);
+  font-size:12px;
+  font-weight:700;
+}
+
+.hero-bottom label{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin:0;
+  color:rgba(255,255,255,.72);
+  font-size:12px;
+}
+
+.hero-bottom select{
+  width:auto;
+  min-width:150px;
+  padding:8px 30px 8px 10px;
+  color:#183b56;
+  background:rgba(255,255,255,.95);
+  border:0;
+  border-radius:9px;
+  font-size:12px;
+}
+
+nav{
+  width:min(1420px,calc(100% - 28px));
+  margin:12px auto 0;
+  border:1px solid var(--aesthetic-line);
+  border-radius:15px;
+  padding:7px;
+  background:rgba(255,255,255,.88);
+  box-shadow:0 8px 25px rgba(24,59,86,.06);
+}
+
+nav button{
+  color:#637b89;
+}
+
+nav button:hover{
+  color:var(--aesthetic-deep);
+  background:var(--aesthetic-soft);
+}
+
+nav button.active{
+  color:#fff;
+  background:var(--aesthetic-deep);
+  box-shadow:0 5px 14px rgba(24,59,86,.18);
+}
+
+main{
+  padding-top:28px;
+}
+
+.panel{
+  border-color:var(--aesthetic-line);
+  box-shadow:0 8px 24px rgba(24,59,86,.055);
+}
+
+.panel:hover{
+  border-color:#c4d7df;
+  box-shadow:0 13px 30px rgba(24,59,86,.09);
+}
+
+h1,h2,h3{
+  color:var(--aesthetic-deep);
+}
+
+button{
+  background:var(--aesthetic-deep);
+  box-shadow:0 5px 13px rgba(24,59,86,.15);
+}
+
+button:hover{
+  background:var(--aesthetic-mid);
+  box-shadow:0 8px 18px rgba(24,59,86,.20);
+}
+
+button.secondary,.btn-secondary{
+  color:var(--aesthetic-deep);
+  background:var(--aesthetic-soft);
+}
+
+.chip{
+  color:var(--aesthetic-deep);
+  background:#e7f0f3;
+}
+
+.stat strong{
+  color:var(--aesthetic-deep);
+}
+
+input:focus,select:focus,textarea:focus{
+  border-color:var(--aesthetic-mid);
+  box-shadow:0 0 0 4px rgba(47,102,135,.10);
+}
+
+@media(max-width:720px){
+  .hero{
+    width:calc(100% - 16px);
+    min-height:500px;
+    border-radius:20px;
+  }
+  .hero-inner{min-height:500px;padding:24px 20px 20px}
+  .hero-copy h1{font-size:38px;letter-spacing:-1.2px}
+  .hero-copy{margin-top:24px}
+  .hero-bottom{align-items:flex-start}
+  nav{width:calc(100% - 16px);margin-top:8px}
+}
+
+</style></head><body>
+<header class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-inner">
+    <div class="brand-lockup">
+      <div class="brand-mark">C</div>
+      <div>
+        <div class="brand-name">CampuSCO</div>
+        <div class="brand-sub">Campus Resource Management</div>
+      </div>
+    </div>
+    <div class="hero-copy">
+      <span class="hero-kicker">SMART CAMPUS • CONNECT • BOOK • COLLABORATE</span>
+      <h1>Everything your campus needs,<br><em>in one place.</em></h1>
+      <p>Find classrooms, laboratories, project spaces and campus support — then book, connect and manage them effortlessly.</p>
+    </div>
+    <div class="hero-bottom">
+      <span id="clock"></span>
+      <label>Viewing as
+        <select id="who" onchange="U=+this.value;ui.sel=null;render()"></select>
+      </label>
+    </div>
+  </div>
+</header>
+<nav id="tabs"></nav><main id="app"></main><div id="toast" role="status"></div>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const hr=h=>`${h%12||12}:00 ${h<12?'AM':'PM'}`,sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let users=[],res=[],U=1,C={},unread=0,ui={tab:'book',rid:1,date:'',sel:null,purpose:'',ai:[],fdate:''};
+async function api(p,b){const r=await fetch('/api/'+p,b?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}:{});const j=await r.json();if(!r.ok)throw new Error(j.error||'Something went wrong');return j}
+function toast(m,bad){const t=$('#toast');t.textContent=m;t.className='show'+(bad?' bad':'');clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='',2800)}
+async function act(p,b,m){try{await api(p,b);if(m)toast(m)}catch(e){toast(e.message,1)}render()}
+const me=()=>users.find(u=>u.id===U)||{},left=e=>{const d=(new Date(e.replace(' ','T'))-new Date(C.now.replace(' ','T')))/6e4;return Math.max(0,Math.ceil(d))+' min'};
+const chip=t=>`<span class="chip ${t}">${t.replace('_','-')}</span>`;
+
+async function boot(){users=await api('users');res=await api('resources');C=await api('clock');ui.date=ui.fdate=C.now.slice(0,10);U=users[0].id;await render();
+  setInterval(()=>{if(!ui.sel&&!document.activeElement.matches('input,select'))render()},5000)}
+async function render(){
+  C=await api('clock');const my=await api('my?user='+U);unread=my.notes.filter(n=>!n.is_read).length;
+  $('#clock').textContent='Campus time: '+C.now+(C.offset?' (simulated)':'');
+  $('#who').innerHTML=users.map(u=>`<option value="${u.id}" ${u.id===U?'selected':''}>${u.name} (${u.role})</option>`).join('');
+  $('#tabs').innerHTML=[['book','Book a resource'],['mine','My bookings'+(unread?` (${unread})`:'')],['skills','Student Skills'],['fac','Faculty Connect'],['ai','Ask CampuSCO AI'],['admin','Admin & demo']]
+    .map(([k,l])=>`<button class="${ui.tab===k?'on':''}" onclick="ui.tab='${k}';render()">${l}</button>`).join('');
+  $('#app').innerHTML=await ({book:vBook,mine:()=>vMine(my),skills:vSkills,fac:vFac,ai:vAi,admin:vAdmin})[ui.tab]();
+}
+/* ---- Book ---- */
+async function vBook(){
+  const s=await api(`slots?resource=${ui.rid}&date=${ui.date}&user=${U}`),r=res.find(x=>x.id===ui.rid);
+  return `<div class="bar">${res.map(x=>`<button class="pill ${x.id===ui.rid?'on':''}" onclick="ui.rid=${x.id};ui.sel=null;render()">${x.name}</button>`).join('')}<input type="date" value="${ui.date}" onchange="ui.date=this.value;ui.sel=null;render()"></div>
+  <h2>${r.name}<small>${r.location} · fits ${r.capacity}</small></h2>
+  <div class="panel">
+    <p><b>Location:</b> ${esc(r.location)}</p>
+    <p><b>Managed by:</b> ${esc(r.manager||'Campus Admin')}</p>
+    <p><b>Department:</b> ${esc(r.department||'General')}</p>
+    <p><b>Eligibility:</b> ${esc(r.eligibility||'ALL')}</p>
+    <p><b>Permission:</b> ${r.approval_required?'Approval required':'Direct booking available'}</p>
+  </div>
+  <p class="note">A booking that isn't checked in within ${C.grace} minutes of the start is released automatically and offered to the waiting list.</p>
+  <div class="grid">${s.map(card).join('')}</div>${ui.sel!=null?`<section class="panel"><h3>Confirm your booking</h3><dl><dt>Resource</dt><dd>${r.name}</dd><dt>Date</dt><dd>${ui.date}</dd><dt>Time</dt><dd>${hr(ui.sel)} – ${hr(ui.sel+1)}</dd><dt>Student</dt><dd>${me().name}</dd></dl>
+  <label>Purpose<br><input value="${esc(ui.purpose)}" placeholder="e.g. AI project" oninput="ui.purpose=this.value"></label><p><button class="pri" onclick="doBook()">Confirm booking</button> <button onclick="ui.sel=null;render()">Cancel</button></p></section>`:''}`;
+}
+function card(s){
+  const join=`<button onclick="act('waitlist',{user:U,resource:ui.rid,date:ui.date,hour:${s.hour}},'Added to the waiting list')">Join waiting list</button>`,pos=s.position?`<p><b style="font-size:14px">Your position: #${s.position}</b><br>People ahead: ${s.position-1}</p>`:join;
+  let c='',b='';
+  if(s.status==='PENDING APPROVAL'){c='wl';b='<p><b>Approval requested</b></p><p>This slot is waiting for resource approval.</p>'}else if(s.status==='BOOKED'){c='bk';b=`<p>${s.mine?'Your booking · '+s.booking_status.replace('_','-'):'Currently booked'}</p><p>Waiting list: ${s.waiting}</p>${s.mine?'':pos}`}
+  else if(s.status==='WAITING LIST'){c='wl';b=s.offer?`<p>Offered to you · <b style="font-size:14px">${left(s.expires)}</b> left</p><button class="pri" onclick="act('accept',{id:${s.offer}},'Slot accepted')">Accept slot</button>`:`<p>Held for a waiting-list student</p>${pos}`}
+  else if(s.status==='AVAILABLE'){c='av';b=(s.released?'<p class="note">Released after a cancellation or no-show</p>':'')+`<button class="pri" onclick="ui.sel=${s.hour};ui.purpose='';render()">Book slot</button>`}
+  return `<div class="slot ${c}"><b>${hr(s.hour)} – ${hr(s.hour+1)}</b>${chip(s.status)}${b}</div>`;
+}
+async function doBook(){try{const r=await api('book',{user:U,resource:ui.rid,date:ui.date,hour:ui.sel,purpose:ui.purpose});toast('Booking confirmed · #'+r.booking);ui.sel=null}catch(e){toast(e.message,1)}render()}
+/* ---- My bookings ---- */
+function vMine(m){
+  const B=m.bookings,g=(t,l)=>l.length?`<h3>${t}</h3>`+l.map(row).join(''):'';
+  const row=b=>`<div class="row"><div><b>${b.rname}</b> · #${b.id}<br>${b.date} · ${hr(b.hour)} – ${hr(b.hour+1)}<br><span class="note">${esc(b.purpose)}${b.status==='PENDING_APPROVAL'?' · waiting for approval':''}${b.checkin_at?' · checked in '+b.checkin_at.slice(11):''}${b.noshow_at?' · released '+b.noshow_at.slice(11):''}</span></div>${chip(b.status)}
+  <div class="acts">${b.status==='CONFIRMED'?`<button class="pri" onclick="act('checkin',{id:${b.id},method:'qr'},'Check-in successful')">Scan QR &amp; check in</button><button onclick="if(confirm('Are you sure you want to cancel this booking?'))act('cancel',{id:${b.id}},'Booking cancelled')">Cancel</button><button onclick="mv(${b.id})">Reschedule</button>`:''}</div></div>`;
+  return `<h2>${me().name}<small>My bookings</small></h2>${m.noshows?`<div class="warn"><b>${m.noshows} no-show${m.noshows>1?'s':''}.</b> ${m.noshows>=3?'An admin may review your booking privileges.':m.noshows==2?'Please cancel bookings you can\'t attend.':'This is a friendly warning.'}</div>`:''}
+  ${m.waitlist.length?'<h3>Waiting list</h3>'+m.waitlist.map(w=>`<div class="row"><div><b>${w.rname}</b><br>${w.date} · ${hr(w.hour)} – ${hr(w.hour+1)}</div>${w.status==='OFFERED'?chip('OFFERED')+` <b>${left(w.expires)}</b> left`:chip('WAITING')+` #${w.position}`}<div class="acts">${w.status==='OFFERED'?`<button class="pri" onclick="act('accept',{id:${w.id}},'Slot accepted')">Accept slot</button>`:''}</div></div>`).join(''):''}
+  ${g('Upcoming',B.filter(b=>b.status==='CONFIRMED'||b.status==='CHECKED_IN'))}${g('Completed',B.filter(b=>b.status==='COMPLETED'))}${g('Cancelled',B.filter(b=>b.status==='CANCELLED'))}${g('No-show',B.filter(b=>b.status==='NO_SHOW'))}
+  <h3>Notifications <button onclick="act('read',{user:U})">Mark all read</button></h3>${m.notes.map(n=>`<div class="row" ${n.is_read?'':'style="border-color:var(--brand)"'}><span>${esc(n.message)}</span><span class="note">${n.created.slice(5)}</span></div>`).join('')||'<p class="note">Nothing yet.</p>'}`;
+}
+function mv(id){const h=prompt('Move to which start hour? (9 to 16, 24-hour)');if(h)act('reschedule',{id,hour:+h},'Booking rescheduled')}
+/* ---- Student Skills ---- */
+async function vSkills(){
+  return `<h2>Student Skills<small>Find campus expertise when you need help.</small></h2>
+    <div class="bar">
+      <input id="skillSearch" style="flex:1" placeholder="Search Python, Robotics, UI/UX, Marketing..." onkeydown="if(event.key==='Enter')searchSkills()">
+      <button class="pri" onclick="searchSkills()">Search</button>
+    </div>
+    <div id="skillsResult"><p class="note">Try Python, Robotics, UI/UX or Machine Learning.</p></div>`;
+}
+async function searchSkills(){
+  const term=$('#skillSearch').value.trim();
+  if(!term){toast('Enter a skill',1);return}
+  try{
+    const data=await api('skills?search='+encodeURIComponent(term));
+    $('#skillsResult').innerHTML=data.length?data.map(s=>`
+      <div class="row">
+        <div><b>${esc(s.name)}</b> · ${esc(s.department)}<br>
+        <span class="note">${esc(s.skill)} · ${esc(s.level)}</span></div>
+        <div class="acts"><button class="pri" onclick="requestSkill(${s.user_id},'${esc(s.skill)}','${esc(s.name)}')">Request Help</button></div>
+      </div>`).join(''):`<div class="panel"><b>No matching student expertise found.</b><p class="note">Try another skill.</p></div>`;
+  }catch(e){toast(e.message,1)}
+}
+async function requestSkill(user_id,skill,name){
+  try{await api('skill-request',{user_id,skill,name:me().name});toast('Help request sent to '+name)}
+  catch(e){toast(e.message,1)}
+}
+/* ---- Faculty Connect ---- */
+async function vFac(){
+  const F=await api('faculty?date='+ui.fdate),M=await api('meetings?user='+U),isF=me().role==='faculty';
+  return `<h2>Faculty Connect<small>Need a faculty member? Request a meeting.</small></h2>
+  ${isF?'':`<div class="bar"><label>Date <input type="date" value="${ui.fdate}" onchange="ui.fdate=this.value;render()"></label></div>${F.map(f=>`<div class="row"><b>${f.name}</b><div class="acts">${f.slots.map(s=>`<button ${s.free?'':'disabled'} onclick="reqMeet(${f.id},${s.hour})">${hr(s.hour)}${s.free?'':' (taken)'}</button>`).join('')}</div></div>`).join('')}`}
+  <h3>${isF?'Requests from students':'My meeting requests'}</h3>${M.map(m=>`<div class="row"><div><b>${isF?m.student:m.faculty}</b> · ${m.date} at ${hr(m.hour)}<br><span class="note">${esc(m.topic)}</span></div>${chip(m.status)}<div class="acts">${isF&&m.status==='PENDING'?`<button class="pri" onclick="act('meetings/respond',{id:${m.id},accept:true},'Accepted')">Accept</button><button onclick="act('meetings/respond',{id:${m.id},accept:false},'Rejected')">Reject</button>`:''}</div></div>`).join('')||'<p class="note">No requests yet.</p>'}`;
+}
+function reqMeet(f,h){const t=prompt('What do you need help with?');if(t)act('meetings',{user:U,faculty:f,date:ui.fdate,hour:h,topic:t},'Request sent')}
+/* ---- AI ---- */
+function vAi(){return `<h2>Ask CampuSCO AI</h2><div style="max-width:640px">${ui.ai.map(m=>`<div class="msg ${m.w}">${esc(m.t)}${(m.s||[]).map(s=>`<br><button onclick="ui.rid=${s.resource_id};ui.date='${s.date}';ui.tab='book';ui.sel=${s.hour};ui.purpose='';render()">Book ${s.name}, ${hr(s.hour)}</button>`).join('')}</div>`).join('')||'<p class="note">Try: "I need a quiet space for my team of 5 to work on our project."</p>'}
+  <div class="bar" style="margin-top:12px"><input id="q" style="flex:1" placeholder="Describe what you need" onkeydown="if(event.key==='Enter')ask()"><button class="pri" onclick="ask()">Ask</button></div></div>`}
+async function ask(){const t=$('#q').value.trim();if(!t)return;ui.ai.push({w:'u',t});const r=await api('ai',{user:U,text:t});ui.ai.push({w:'a',t:r.reply,s:r.suggestions});render()}
+/* ---- Admin & demo ---- */
+async function vAdmin(){
+  const s=await api('admin/stats'),approvals=await api('admin/approvals'),F=(k,l)=>`<label>${l} <input type="number" min="1" style="width:70px" value="${C[k]}" onchange="act('admin/config',{${k}:+this.value})"></label>`;
+  return `<h2>Admin &amp; demo</h2><div class="stats">${[['Total bookings',s.total],['Active',s.active],['Completed',s.completed],['Cancellations',s.cancelled],['No-shows',s.noshows],['Waiting-list requests',s.waiting],['Released slots',s.released],['Pending approvals',s.pending_approval||0]].map(([l,v])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('')}</div>
+  <h3>Resource access approvals</h3>
+  ${approvals.length?approvals.map(a=>`<div class="row"><div><b>${esc(a.resource)}</b> · ${esc(a.student)}<br><span class="note">${a.date} · ${hr(a.hour)} · ${esc(a.purpose||'General use')}</span><br><span class="note">Managed by ${esc(a.manager)} · ${esc(a.location)} · Eligible department: ${esc(a.department)}</span></div><div class="acts"><button class="pri" onclick="act('admin/approval',{id:${a.id},accept:true},'Booking approved')">Approve</button><button onclick="act('admin/approval',{id:${a.id},accept:false},'Booking rejected')">Reject</button></div></div>`).join(''):'<p class="note">No pending approval requests.</p>'}
+  <h3>No-show demo</h3><p>Runs the full flow: book, waitlist, no-show, <b>automatic release</b>, offer, accept, check-in, complete.</p>
+  <div class="bar"><button class="pri" onclick="demo()">Run no-show demo</button><button onclick="act('admin/advance',{minutes:15},'+15 min')">+15 min</button><button onclick="act('admin/advance',{minutes:60},'+1 hr')">+1 hr</button><button onclick="act('admin/realclock',{},'Real clock')">Use real clock</button><button onclick="if(confirm('Reset all data?'))act('admin/demo-reset',{},'Data reset')">Reset data</button></div>
+  <h3>Resource utilization</h3><div class="wrap"><table><tr><th>Resource</th><th>Available h</th><th>Booked h</th><th>Used h</th><th>No-shows</th><th>No-show rate</th><th>Cancelled</th><th>Waiting</th></tr>${s.resources.map(r=>`<tr><td>${r.name}</td><td>${r.available}</td><td>${r.booked}</td><td>${r.used}</td><td>${r.noshow}</td><td>${r.noshow_rate}%</td><td>${r.cancelled}</td><td>${r.waiting}</td></tr>`).join('')}</table></div>
+  <h3>Rules</h3><div class="bar">${F('grace','Grace period (min)')}${F('confirm','Waiting-list confirm (min)')}${F('cancel_by','Cancel deadline (min)')}${F('max','Max bookings')}</div>
+  ${s.pending.length?'<h3>Staff check-in</h3>'+s.pending.map(b=>`<div class="row"><span>${b.uname} · ${b.rname} · ${b.date} ${hr(b.hour)}</span><button onclick="act('checkin',{id:${b.id},method:'staff'},'Checked in by staff')">Check in</button></div>`).join(''):''}
+  <h3>Student no-shows</h3><div class="wrap"><table><tr><th>Student</th><th>No-shows</th><th>Status</th></tr>${s.students.map(x=>`<tr><td>${x.name}</td><td>${x.ns}</td><td>${x.ns>=3?'Admin review':x.ns==2?'Reminder':x.ns==1?'Warning':'Good standing'}</td></tr>`).join('')}</table></div>`;
+}
+async function demo(){
+  try{await api('admin/demo-reset',{});C=await api('clock');const d=C.now.slice(0,10),step=async(m,f)=>{toast(m);await f();ui.tab='book';ui.rid=1;ui.date=d;await render();await sleep(1800)};
+  U=1;await step('1/6 Pavan books AI/ML Lab, 11 AM',()=>api('book',{user:1,resource:1,date:d,hour:11,purpose:'AI Project'}));
+  U=2;await step('2/6 Krithi finds it booked and joins the waiting list',()=>api('waitlist',{user:2,resource:1,date:d,hour:11}));
+  await step('3/6 11:15 passes and Pavan never checked in: auto-released',()=>api('admin/advance',{minutes:45}));
+  await step('4/6 Krithi is offered the freed slot and accepts',async()=>{const m=await api('my?user=2');await api('accept',{id:m.waitlist.find(w=>w.status==='OFFERED').id})});
+  await step('5/6 Krithi scans the QR and checks in',async()=>{await api('admin/advance',{minutes:5});const m=await api('my?user=2');await api('checkin',{id:m.bookings.find(b=>b.status==='CONFIRMED').id,method:'qr'})});
+  await step('6/6 Session over: COMPLETED',()=>api('admin/advance',{minutes:60}));ui.tab='mine';await render();toast('Demo finished. Check "My bookings" for Krithi and Pavan.')}catch(e){toast(e.message,1)}
+}
+boot();
+</script></body></html>
